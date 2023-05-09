@@ -1,0 +1,72 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"git.autoRepositoryDetection": "subFolders",
+		"clangd.arguments": [
+			"--compile-commands-dir=E:/source/sing_box_config/build/Ninja_debug"
+		],
+		"editor.tabSize": 2,
+		"editor.fontLigatures": true,
+		"editor.formatOnType": true,
+		"editor.codeLensFontFamily": "'sarasa mono sc',Consolas, monospace",
+		"files.exclude": {
+			".idea": true,
+			".venv": true,
+			".vs": true,
+			".vscode": false,
+		},
+		"C_Cpp.exclusionPolicy": "checkFolders",
+		"editor.formatOnSaveMode": "modifications",
+		"todo-tree.regex.regexCaseSensitive": false,
+		"git.fetchOnPull": true,
+		"C_Cpp.autocompleteAddParentheses": true,
+		"boost-test-adapter-feher.tests": [
+			{
+				"testExecutables": [
+					{
+						"path": "${workspaceFolder}/build/Ninja_debug/bin/test_main.exe",
+					}
+				],
+				"cwd": "${workspaceFolder}/build",
+				"sourcePrefix": "${workspaceFolder}",
+				"debugConfig": "Doodle_debug"
+			},
+		],
+		"C_Cpp.intelliSenseEngine": "disabled",
+		"cmake.configureOnEdit": false,
+		"cmake.configureOnOpen": false,
+		"cmake.automaticReconfigure": false,
+		"cmake.skipConfigureIfCachePresent": false,
+		"sqltools.useNodeRuntime": true
+	},
+	"launch": {
+		"version": "0.2.0",
+		"setupCommands": [
+			{
+				"text": "set charset UTF-8"
+			}
+		],
+		"configurations": [
+			{
+				"name": "Debug",
+				"type": "cppvsdbg",
+				"request": "launch",
+				"program": "${command:cmake.getLaunchTargetPath}",
+				"args": [
+					"--config=C:/Users/td_main/private/backup/Config.json",
+					"--subscribe=https://v2.mugua-sub.com/link/LX1EsJskFXyDCEHq?sub=3",
+					"--subscribe=https://ddddb1.cyou/api/v1/client/subscribe?token=c2dd7049ce24287bd96a80b3953767b0",
+					"--out=C:/Users/td_main/private/backup/sing-box/Config.json"
+				],
+				"stopAtEntry": false,
+				"cwd": "${command:cmake.launchTargetDirectory}",
+				"console": "internalConsole"
+			},
+		],
+		"compounds": []
+	}
+}

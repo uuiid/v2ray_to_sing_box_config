@@ -1,0 +1,22 @@
+BasedOnStyle: Google
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: "doodle_core"
+    Priority: 2
+    SortPriority: 2
+  - Regex: "doodle_app"
+    Priority: 3
+    SortPriority: 3
+  - Regex: "doodle_lib"
+    Priority: 4
+    SortPriority: 4
+  - Regex: "boost"
+    Priority: 6
+    SortPriority: 6
+  - Regex: "maya_plug"
+    Priority: 7
+    SortPriority: 7
+
+ColumnLimit: 120
+AlignConsecutiveAssignments: AcrossEmptyLinesAndComments
+AlignAfterOpenBracket: BlockIndent

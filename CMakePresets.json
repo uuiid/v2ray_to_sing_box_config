@@ -1,0 +1,60 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "Ninja_build",
+      "displayName": "Ninja build",
+      "description": "Ninja build using vcpkg",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "installDir": "${sourceDir}/build/install/$env{doodle_install_prefix}",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "toolset": {
+        "value": "v142,host=x64,version=14",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_CXX_COMPILER": "cl",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": true
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [
+            "Windows"
+          ],
+          "disableExternalAnalysis": true
+        }
+      },
+      "cmakeExecutable": "C:/Program Files/CMake/bin/cmake.exe",
+      "hidden": true
+    },
+    {
+      "name": "Ninja_release",
+      "inherits": "Ninja_build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "Ninja_debug",
+      "inherits": "Ninja_build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "Boost_NO_WARN_NEW_VERSIONS": true
+      }
+    }
+  ],
+  "buildPresets": [],
+  "testPresets": [],
+  "vendor": {}
+}

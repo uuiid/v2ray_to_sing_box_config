@@ -1,0 +1,50 @@
+{
+  "name": "sing-config",
+  "description": [
+    "this is doodle exe projet .",
+    "has maya plug ,ue plug and exe file"
+  ],
+  "version": "2.3.1.9",
+  "$default-features-explanation": "Users using this library transitively will get all backends automatically",
+  "default-features": [],
+  "features": {},
+  "builtin-baseline": "ffe7360e0f5ba62f98b620575294ecb9d8a02980",
+  "dependencies": [
+    "boost-asio",
+    "boost-test",
+    "boost-log",
+    "boost-numeric-conversion",
+    "boost-process",
+    "boost-signals2",
+    "boost-dll",
+    "boost-ptr-container",
+    "boost-callable-traits",
+    "boost-beast",
+    "boost-icl",
+    "boost-algorithm",
+    "boost-locale",
+    "boost-url",
+    "cpp-base64",
+    "fmt",
+    "argh",
+    "openssl",
+    {
+      "name": "imgui",
+      "default-features": false,
+      "features": [
+        "win32-binding",
+        "dx11-binding",
+        "docking-experimental"
+      ]
+    },
+    "magic-enum",
+    "nlohmann-json",
+    "date",
+    "entt"
+  ],
+  "vcpkg-configuration": {
+    "overlay-ports": [
+      "./vcpkg/ports"
+    ]
+  }
+}
