@@ -35,7 +35,7 @@ jobs:
         # This specifies the location of vcpkg, where it is going to be restored from cache, or create from scratch.
         vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
         # The Git commit id of vcpkg to be checked out. This is only needed because we are not using a submodule.
-        vcpkgGitCommitId: '6a3dd0874f153f8b375ec26210ea6d41dee3bb26'
+        vcpkgGitCommitId: 'ffe7360e0f5ba62f98b620575294ecb9d8a02980'
         # The vcpkg.json file, which will be part of cache key computation.
         vcpkgJsonGlob: '**/cmakepresets/vcpkg.json'
     - name: Prints output of run-vcpkg's action
