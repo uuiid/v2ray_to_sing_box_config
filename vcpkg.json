@@ -28,15 +28,6 @@
     "fmt",
     "argh",
     "openssl",
-    {
-      "name": "imgui",
-      "default-features": false,
-      "features": [
-        "win32-binding",
-        "dx11-binding",
-        "docking-experimental"
-      ]
-    },
     "magic-enum",
     "nlohmann-json",
     "date",
