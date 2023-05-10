@@ -94,6 +94,7 @@ class out_base {
   std::string type;
   std::string server;
   std::int32_t server_port;
+  multiplex_type multiplex;
 
   [[nodiscard]] virtual nlohmann::json get_json() const = 0;
 
@@ -102,6 +103,9 @@ class out_base {
     in_json["server_port"] = in_data.server_port;
     in_json["tag"]         = in_data.tag;
     in_json["type"]        = in_data.type;
+    if (in_data.multiplex.enabled) {
+      in_json["multiplex"] = in_data.multiplex;
+    }
   }
 };
 template <typename T>
@@ -120,7 +124,6 @@ class out_vmess : public to_json_temp<out_vmess> {
   std::string uuid;
   std::shared_ptr<tls_type> tls;
   std::shared_ptr<transport_type> transport;
-  multiplex_type multiplex;
 
   friend void to_json(nlohmann::json &in_json, const out_vmess &in_data) {
     to_json(in_json, static_cast<const out_base &>(in_data));
@@ -133,9 +136,6 @@ class out_vmess : public to_json_temp<out_vmess> {
     }
     if (in_data.transport) {
       in_json["transport"] = *in_data.transport;
-    }
-    if (in_data.multiplex.enabled) {
-      in_json["multiplex"] = in_data.multiplex;
     }
   }
 };
@@ -178,6 +178,7 @@ std::vector<std::shared_ptr<out_base>> get_config(const std::string &in_body) {
       l_out->server_port = std::stoi(l_port);
       l_out->password    = l_id;
       l_out->method      = l_method;
+      // l_out->multiplex.enabled = true;
       l_ret.emplace_back(l_out);
     } else {
       auto l_sub  = l_str.substr(l_point + 3);
