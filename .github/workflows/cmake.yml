@@ -58,13 +58,6 @@ jobs:
     - name: Build
       # Build your program with the given configuration
       run: cmake --build --preset ${{env.BUILD_TARGET}}
-
-    - name: Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          ${{github.workspace}}/build/Ninja_release/*.dll
-          ${{github.workspace}}/build/Ninja_release/*.exe
     # - name: Test
     #   working-directory: ${{github.workspace}}/build
     #   # Execute tests defined by the CMake configuration.
