@@ -62,7 +62,8 @@
       "configurePreset": "Ninja_release",
       "jobs": 10,
       "targets": [
-        "sing_box_config"
+        "sing_box_config",
+        "install"
       ]
     }
   ],

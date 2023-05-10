@@ -62,8 +62,8 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          ${{github.workspace}}/build/Ninja_release/*.dll
-          ${{github.workspace}}/build/Ninja_release/*.exe
+          ${{github.workspace}}/build/install/**
+          ${{github.workspace}}/build/install/**
     # - name: Test
     #   working-directory: ${{github.workspace}}/build
     #   # Execute tests defined by the CMake configuration.
