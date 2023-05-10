@@ -31,9 +31,10 @@ jobs:
       run: |
         echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
+    - uses: ilammy/msvc-dev-cmd@v1
+
     - name: Install ninja-build tool
       uses: seanmiddleditch/gha-setup-ninja@v3
-
       
     - name: Cache vcpkg
       id: cache-vcpkg
