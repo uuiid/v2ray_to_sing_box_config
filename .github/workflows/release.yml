@@ -43,7 +43,6 @@ jobs:
           ${{ env.VCPKG_ROOT }}
           !${{ env.VCPKG_ROOT }}/.git
           !${{ env.VCPKG_ROOT }}/buildtrees
-          !${{ env.VCPKG_ROOT }}/packages
           !${{ env.VCPKG_ROOT }}/downloads
           ${{ github.workspace }}/build/vcpkg_installed
         key: ${{ runner.os }}-cache-key-v1-${{ hashFiles( 'vcpkg.json' ) }}
