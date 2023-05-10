@@ -48,8 +48,7 @@ jobs:
           !${{ env.VCPKG_ROOT }}/downloads
           ${{ github.workspace }}/build/vcpkg_installed
         key: ${{ runner.os }}-cache-key-v1-${{ hashFiles( 'vcpkg.json' ) }}
-        restore-keys: |
-        ${{ runner.os }}-cache-key-v1-
+        restore-keys: ${{ runner.os }}-cache-key-v1-
       
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
