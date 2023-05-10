@@ -87,27 +87,47 @@ class multiplex_type {
     in_json["max_connections"] = in_data.max_connections;
   }
 };
-class out_json {
+
+class out_base {
  public:
-  std::int32_t alter_id;
-  std::string server;
-  std::int32_t server_port;
   std::string tag;
   std::string type;
+  std::string server;
+  std::int32_t server_port;
+
+  [[nodiscard]] virtual nlohmann::json get_json() const = 0;
+
+  friend void to_json(nlohmann::json &in_json, const out_base &in_data) {
+    in_json["server"]      = in_data.server;
+    in_json["server_port"] = in_data.server_port;
+    in_json["tag"]         = in_data.tag;
+    in_json["type"]        = in_data.type;
+  }
+};
+template <typename T>
+class to_json_temp : public out_base {
+ public:
+  [[nodiscard]] nlohmann::json get_json() const {
+    nlohmann::json l_json;
+    l_json = static_cast<const T &>(*this);
+    return l_json;
+  }
+};
+
+class out_vmess : public to_json_temp<out_vmess> {
+ public:
+  std::int32_t alter_id;
   std::string uuid;
   std::shared_ptr<tls_type> tls;
   std::shared_ptr<transport_type> transport;
   multiplex_type multiplex;
 
-  friend void to_json(nlohmann::json &in_json, const out_json &in_data) {
-    in_json["alter_id"]    = in_data.alter_id;
-    in_json["security"]    = "auto";
-    in_json["server"]      = in_data.server;
-    in_json["server_port"] = in_data.server_port;
-    in_json["tag"]         = in_data.tag;
-    in_json["type"]        = in_data.type;
-    in_json["network"]     = "tcp";
-    in_json["uuid"]        = in_data.uuid;
+  friend void to_json(nlohmann::json &in_json, const out_vmess &in_data) {
+    to_json(in_json, static_cast<const out_base &>(in_data));
+    in_json["alter_id"] = in_data.alter_id;
+    in_json["security"] = "auto";
+    in_json["network"]  = "tcp";
+    in_json["uuid"]     = in_data.uuid;
     if (in_data.tls) {
       in_json["tls"] = *in_data.tls;
     }
@@ -120,43 +140,76 @@ class out_json {
   }
 };
 
-std::vector<out_json> get_config(const std::string &in_body) {
-  std::vector<out_json> l_ret{};
+class out_shadowsocks : public to_json_temp<out_shadowsocks> {
+ public:
+  std::string method;
+  std::string password;
+  using to_json_temp<out_shadowsocks>::get_json;
+
+  friend void to_json(nlohmann::json &in_json, const out_shadowsocks &in_data) {
+    to_json(in_json, static_cast<const out_base &>(in_data));
+    in_json["method"]   = in_data.method;
+    in_json["password"] = in_data.password;
+  }
+};
+
+std::vector<std::shared_ptr<out_base>> get_config(const std::string &in_body) {
+  std::vector<std::shared_ptr<out_base>> l_ret{};
   std::stringstream l_str_str{base64_decode(in_body)};
   for (std::string l_str; std::getline(l_str_str, l_str);) {
-    std::vector<std::string> l_config_list{};
+    boost::replace_all(l_str, "\r", "");
     auto l_point = l_str.find(':');
-    auto l_sub   = l_str.substr(l_point + 3);
-    boost::replace_all(l_sub, "\r", "");
+
     std::cout << fmt::format("{}", l_str) << std::endl;
-    auto l_json = nlohmann::json::parse(base64_decode(l_sub));
-    std::cout << fmt::format("{}", base64_decode(l_sub)) << std::endl;
+    if (l_str.substr(0, l_point) == "ss") {
+      boost::urls::url l_url{l_str};
+      auto l_out = std::make_shared<out_shadowsocks>();
+      // ss://YWVzLTI1Ni1nY206MTcwYmZjMTktMWQ2OC00YWQ2LWE4ZTgtM2JlYzJlNmQ5NzBm@bgp.hofhasharon.org:37003#剩余流量：50 GB
+      std::cout << fmt::format("{}", l_url.c_str()) << std::endl;
+      auto l_str         = base64_decode(l_url.userinfo());
+      auto l_add         = l_url.host();
+      auto l_port        = l_url.port();
+      auto l_name        = l_url.fragment();
+      auto l_method      = l_str.substr(0, l_str.find(':'));
+      auto l_id          = l_str.substr(l_str.find(':') + 1);
+      l_out->server      = l_add;
+      l_out->tag         = l_name;
+      l_out->type        = "shadowsocks";
+      l_out->server_port = std::stoi(l_port);
+      l_out->password    = l_id;
+      l_out->method      = l_method;
+      l_ret.emplace_back(l_out);
+    } else {
+      auto l_sub  = l_str.substr(l_point + 3);
+      auto l_json = nlohmann::json::parse(base64_decode(l_sub));
+      std::cout << fmt::format("{}", base64_decode(l_sub)) << std::endl;
 
-    auto l_file_name = l_json["ps"].get<std::string>();
-    boost::replace_all(l_file_name, " ", "");
-    boost::replace_all(l_file_name, "\t", "");
+      auto l_file_name = l_json["ps"].get<std::string>();
+      boost::replace_all(l_file_name, " ", "");
+      boost::replace_all(l_file_name, "\t", "");
 
-    out_json l_out{};
-    l_out.alter_id =
-        l_json["aid"].is_string() ? std::stoi(l_json["aid"].get<std::string>()) : l_json["aid"].get<std::int32_t>();
-    l_out.type = l_str.substr(0, l_point);
-    l_out.tag  = l_file_name;
-    l_out.uuid = l_json["id"].get<std::string>();
-    l_out.server_port =
-        l_json["port"].is_string() ? std::stoi(l_json["port"].get<std::string>()) : l_json["port"].get<std::int32_t>();
-    l_out.server = l_json["add"].get<std::string>();
-    if (l_json["net"].get<std::string>() == "ws") {
-      l_out.transport               = std::make_shared<transport_type>();
-      l_out.transport->path         = l_json["path"].get<std::string>();
-      l_out.transport->type         = l_json["net"].get<std::string>();
-      l_out.transport->headers_host = l_json["host"].get<std::string>();
+      auto l_out = std::make_shared<out_vmess>();
+      l_out->alter_id =
+          l_json["aid"].is_string() ? std::stoi(l_json["aid"].get<std::string>()) : l_json["aid"].get<std::int32_t>();
+      l_out->type        = l_str.substr(0, l_point);
+      l_out->tag         = l_file_name;
+      l_out->uuid        = l_json["id"].get<std::string>();
+      l_out->server_port = l_json["port"].is_string() ? std::stoi(l_json["port"].get<std::string>())
+                                                      : l_json["port"].get<std::int32_t>();
+      l_out->server      = l_json["add"].get<std::string>();
+      if (l_json["net"].get<std::string>() == "ws") {
+        l_out->transport               = std::make_shared<transport_type>();
+        l_out->transport->path         = l_json["path"].get<std::string>();
+        l_out->transport->type         = l_json["net"].get<std::string>();
+        l_out->transport->headers_host = l_json["host"].get<std::string>();
+      }
+      if (!l_json["tls"].empty()) {
+        l_out->tls              = std::make_shared<tls_type>();
+        l_out->tls->server_name = l_json["host"];
+      }
+      // l_out.multiplex.enabled = true;
+      l_ret.emplace_back(l_out);
     }
-    if (!l_json["tls"].empty()) {
-      l_out.tls              = std::make_shared<tls_type>();
-      l_out.tls->server_name = l_json["host"];
-    }
-    // l_out.multiplex.enabled = true;
-    l_ret.emplace_back(l_out);
   }
   return l_ret;
 }
@@ -173,7 +226,7 @@ int main(int argc, char *argv[]) try {
   auto l_json = nlohmann::json::parse(std::ifstream{cmdl("config").str()});
 
   l_ssl_context.set_default_verify_paths();
-  auto &l_route_direct = l_json["route"]["rules"].emplace_back();
+  auto &l_route_direct       = l_json["route"]["rules"].emplace_back();
   l_route_direct["outbound"] = "direct";
   for (auto &&i : cmdl.params("subscribe")) {
     boost::urls::url l_subscribe{i.second};
@@ -203,9 +256,9 @@ int main(int argc, char *argv[]) try {
     auto l_config = get_config(l_res.body());
 
     for (auto &&i : l_config) {
-      l_json["outbounds"].push_back(i);
-      l_json["outbounds"].front()["outbounds"].emplace_back(i.tag);
-      l_route_direct["domain"].emplace_back(i.server);
+      l_json["outbounds"].push_back(i->get_json());
+      l_json["outbounds"].front()["outbounds"].emplace_back(i->tag);
+      l_route_direct["domain"].emplace_back(i->server);
     }
     boost::system::error_code l_ec{};
     l_stream.shutdown(l_ec);
