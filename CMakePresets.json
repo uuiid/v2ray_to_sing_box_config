@@ -52,7 +52,18 @@
       }
     }
   ],
-  "buildPresets": [],
+  "buildPresets": [
+    {
+      "name": "build_release",
+      "description": "构建 exe",
+      "displayName": "构建 exe",
+      "configurePreset": "Ninja_release",
+      "jobs": 10,
+      "targets": [
+        "sing_box_config"
+      ]
+    }
+  ],
   "testPresets": [],
   "vendor": {}
 }
