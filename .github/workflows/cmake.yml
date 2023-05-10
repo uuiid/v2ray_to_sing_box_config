@@ -21,7 +21,7 @@ jobs:
 
     # 创建权限
     permissions:
-      contents: read/write
+      contents: write
 
     steps:
     - uses: actions/checkout@v3
