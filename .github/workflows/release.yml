@@ -61,8 +61,8 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          ${{github.workspace}}/build/install/**
-          ${{github.workspace}}/build/install/**
+          build/install/**
+          build/install/**
     # - name: Test
     #   working-directory: ${{github.workspace}}/build
     #   # Execute tests defined by the CMake configuration.
