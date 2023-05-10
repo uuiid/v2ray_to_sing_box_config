@@ -2,9 +2,8 @@ name: CMake
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    tags:
+      - "v*.*.*"
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -18,6 +17,10 @@ jobs:
     # You can convert this to a matrix build if you need cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: windows-latest
+
+    # 创建权限
+    permissions:
+      contents: read/write
 
     steps:
     - uses: actions/checkout@v3
@@ -40,6 +43,12 @@ jobs:
       # Build your program with the given configuration
       run: cmake --build --preset ${{env.BUILD_TARGET}}
 
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          ${{github.workspace}}/build/Ninja_release/*.dll
+          ${{github.workspace}}/build/Ninja_release/*.exe
     # - name: Test
     #   working-directory: ${{github.workspace}}/build
     #   # Execute tests defined by the CMake configuration.
