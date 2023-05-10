@@ -10,7 +10,7 @@ env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Ninja_release
   BUILD_TARGET: build_release
-  VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
+  VCPKG_BINARY_SOURCES: 'default'
 
 jobs:
   build:
@@ -22,27 +22,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - uses: lukka/get-cmake@latest
-    - name: Dump the content of $RUNNER_TEMP
-      run: find $RUNNER_TEMP
+    - name: "Set environmental variables"
       shell: bash
-    - name: Dump the content of $RUNNER_WORKSPACE
-      run: find $RUNNER_WORKSPACE
-      shell: bash
-
-    - name: Setup vcpkg
-      uses: lukka/run-vcpkg@main
-      id: runvcpkg
-      with:
-        # This specifies the location of vcpkg, where it is going to be restored from cache, or create from scratch.
-        vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
-        # The Git commit id of vcpkg to be checked out. This is only needed because we are not using a submodule.
-        vcpkgGitCommitId: 'ffe7360e0f5ba62f98b620575294ecb9d8a02980'
-        # The vcpkg.json file, which will be part of cache key computation.
-        vcpkgJsonGlob: '${{github.workspace}}/vcpkg.json'
-    - name: Prints output of run-vcpkg's action
-      run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}', triplet='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT }}'"
-
+      run: |
+        echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
     
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
