@@ -75,9 +75,7 @@ jobs:
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        files: |
-          build/install/**
-          build/install/**
+        files: build/sing_box_config*.7z
     # - name: Test
     #   working-directory: ${{github.workspace}}/build
     #   # Execute tests defined by the CMake configuration.

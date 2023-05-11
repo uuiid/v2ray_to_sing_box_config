@@ -63,7 +63,8 @@
       "jobs": 10,
       "targets": [
         "sing_box_config",
-        "install"
+        "install",
+        "package"
       ]
     }
   ],

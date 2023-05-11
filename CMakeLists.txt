@@ -22,7 +22,9 @@ add_executable(sing_box_config
   win_exe.rc
   sing_box.manifest
 )
-
+set(CPACK_GENERATOR 7Z)
+set(CPACK_PACKAGE_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
+include(CPack)
 # target_include_directories(sing_box_config PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(sing_box_config PUBLIC nlohmann_json::nlohmann_json fmt::fmt Boost::locale Boost::url OpenSSL::SSL)
 
