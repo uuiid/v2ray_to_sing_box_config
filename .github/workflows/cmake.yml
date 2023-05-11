@@ -40,13 +40,14 @@ jobs:
 
     - name: Setup vcpkg
       uses: lukka/run-vcpkg@v11
-        with:
-          # This specifies the location of vcpkg, where it is going to be restored from cache, or create from scratch.
-          vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
-          # The Git commit id of vcpkg to be checked out. This is only needed because we are not using a submodule.
-          vcpkgGitCommitId: '44ef24047189915245da802501e3b38abab4be5d'
-          # The vcpkg.json file, which will be part of cache key computation.
-          vcpkgJsonGlob: '**/vcpkg.json'
+      id: runvcpkg
+      with:
+        # This specifies the location of vcpkg, where it is going to be restored from cache, or create from scratch.
+        vcpkgDirectory: '${{ runner.workspace }}/b/vcpkg'
+        # The Git commit id of vcpkg to be checked out. This is only needed because we are not using a submodule.
+        vcpkgGitCommitId: '44ef24047189915245da802501e3b38abab4be5d'
+        # The vcpkg.json file, which will be part of cache key computation.
+        vcpkgJsonGlob: '**/vcpkg.json'
     # - name: Cache vcpkg
     #   id: cache-vcpkg
     #   uses: actions/cache@v3
