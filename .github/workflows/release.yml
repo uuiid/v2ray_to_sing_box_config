@@ -62,7 +62,7 @@ jobs:
       run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}', triplet='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT }}'"
     
     - name: Run CMake+vcpkg+Ninja
-      uses: lukka/run-cmake@v10
+      uses: lukka/run-cmake@v10.5
       id: runcmake
       with:
         configurePreset: '${{env.BUILD_TYPE}}'
