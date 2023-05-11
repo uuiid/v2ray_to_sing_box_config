@@ -32,13 +32,13 @@ jobs:
 
     - uses: ilammy/msvc-dev-cmd@v1
 
-    - name: Install ninja-build tool
-      uses: seanmiddleditch/gha-setup-ninja@v3
+    # - name: Install ninja-build tool
+    #   uses: seanmiddleditch/gha-setup-ninja@v3
 
     - uses: lukka/get-cmake@latest
 
     - name: Setup vcpkg
-      uses: lukka/run-vcpkg@v11
+      uses: lukka/run-vcpkg@main
       id: runvcpkg
       with:
         # This specifies the location of vcpkg, where it is going to be restored from cache, or create from scratch.
@@ -60,15 +60,13 @@ jobs:
 
     - name: Prints output of run-vcpkg's action
       run: echo "root='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_ROOT_OUT }}', triplet='${{ steps.runvcpkg.outputs.RUNVCPKG_VCPKG_DEFAULT_TRIPLET_OUT }}'"
-
-    - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -S${{github.workspace}} --preset ${{env.BUILD_TYPE}}
-
-    - name: Build
-      # Build your program with the given configuration
-      run: cmake --build --preset ${{env.BUILD_TARGET}}
+    
+    - name: Run CMake+vcpkg+Ninja
+      uses: lukka/run-cmake@v10
+      id: runcmake
+      with:
+        configurePreset: '${{env.BUILD_TYPE}}'
+        buildPreset: '${{env.BUILD_TARGET}}'
 
     - name: Release
       uses: softprops/action-gh-release@v1
