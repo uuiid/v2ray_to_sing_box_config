@@ -267,7 +267,7 @@ int main(int argc, char *argv[]) try {
   }
   std::ofstream{cmdl("out").str()} << l_json.dump(2) << std::endl;
   return 0;
-} catch (std::exception &e) {
+} catch (const std::exception &e) {
   std::cout << fmt::format("{}", e.what()) << std::endl;
   return 0;
 }
