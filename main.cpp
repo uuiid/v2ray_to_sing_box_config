@@ -81,10 +81,12 @@ class multiplex_type {
   bool enabled;
   std::string protocol{"h2mux"};
   std::int32_t max_connections{4};
+  bool padding{true};
   friend void to_json(nlohmann::json &in_json, const multiplex_type &in_data) {
     in_json["enabled"]         = in_data.enabled;
     in_json["protocol"]        = in_data.protocol;
     in_json["max_connections"] = in_data.max_connections;
+    in_json["padding"]         = in_data.padding;
   }
 };
 
@@ -111,7 +113,7 @@ class out_base {
 template <typename T>
 class to_json_temp : public out_base {
  public:
-  [[nodiscard]] nlohmann::json get_json() const {
+  [[nodiscard]] nlohmann::json get_json() const final {
     nlohmann::json l_json;
     l_json = static_cast<const T &>(*this);
     return l_json;
@@ -178,7 +180,7 @@ std::vector<std::shared_ptr<out_base>> get_config(const std::string &in_body) {
       l_out->server_port = std::stoi(l_port);
       l_out->password    = l_id;
       l_out->method      = l_method;
-      // l_out->multiplex.enabled = true;
+      l_out->multiplex.enabled = false;
       l_ret.emplace_back(l_out);
     } else {
       auto l_sub  = l_str.substr(l_point + 3);
@@ -208,7 +210,7 @@ std::vector<std::shared_ptr<out_base>> get_config(const std::string &in_body) {
         l_out->tls              = std::make_shared<tls_type>();
         l_out->tls->server_name = l_json["host"];
       }
-      // l_out.multiplex.enabled = true;
+      l_out->multiplex.enabled = false;
       l_ret.emplace_back(l_out);
     }
   }
