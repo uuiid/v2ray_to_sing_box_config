@@ -168,18 +168,18 @@ std::vector<std::shared_ptr<out_base>> get_config(const std::string &in_body) {
       auto l_out = std::make_shared<out_shadowsocks>();
       // ss://YWVzLTI1Ni1nY206MTcwYmZjMTktMWQ2OC00YWQ2LWE4ZTgtM2JlYzJlNmQ5NzBm@bgp.hofhasharon.org:37003#剩余流量：50 GB
       std::cout << fmt::format("{}", l_url.c_str()) << std::endl;
-      auto l_str         = base64_decode(l_url.userinfo());
-      auto l_add         = l_url.host();
-      auto l_port        = l_url.port();
-      auto l_name        = l_url.fragment();
-      auto l_method      = l_str.substr(0, l_str.find(':'));
-      auto l_id          = l_str.substr(l_str.find(':') + 1);
-      l_out->server      = l_add;
-      l_out->tag         = l_name;
-      l_out->type        = "shadowsocks";
-      l_out->server_port = std::stoi(l_port);
-      l_out->password    = l_id;
-      l_out->method      = l_method;
+      auto l_str               = base64_decode(l_url.userinfo());
+      auto l_add               = l_url.host();
+      auto l_port              = l_url.port();
+      auto l_name              = l_url.fragment();
+      auto l_method            = l_str.substr(0, l_str.find(':'));
+      auto l_id                = l_str.substr(l_str.find(':') + 1);
+      l_out->server            = l_add;
+      l_out->tag               = l_name;
+      l_out->type              = "shadowsocks";
+      l_out->server_port       = std::stoi(l_port);
+      l_out->password          = l_id;
+      l_out->method            = l_method;
       l_out->multiplex.enabled = false;
       l_ret.emplace_back(l_out);
     } else {
@@ -250,6 +250,7 @@ int main(int argc, char *argv[]) try {
         boost::beast::http::verb::get, l_subscribe.encoded_target(), 11};
     l_req.set(boost::beast::http::field::host, l_subscribe.host());
     l_req.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+    l_req.set(boost::beast::http::field::connection, "close");
 
     boost::beast::http::write(l_stream, l_req);
 
