@@ -206,7 +206,7 @@ std::vector<std::shared_ptr<out_base>> get_config(const std::string &in_body) {
         l_out->transport->type         = l_json["net"].get<std::string>();
         l_out->transport->headers_host = l_json["host"].get<std::string>();
       }
-      if (!l_json["tls"].empty()) {
+      if (!l_json["tls"].get<std::string>().empty()) {
         l_out->tls              = std::make_shared<tls_type>();
         l_out->tls->server_name = l_json["host"];
       }
