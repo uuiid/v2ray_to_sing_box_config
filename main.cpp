@@ -222,7 +222,9 @@ void set_log(nlohmann::json &in_json) {
   if (!in_json.contains("log")) return;
   if (!in_json["log"].contains("output")) return;
   std::filesystem::path l_path{in_json["log"]["output"].get<std::string>()};
-  l_path.replace_filename(fmt::format("{}_{}.txt", l_path.stem().generic_string(), std::chrono::system_clock::now()));
+  l_path.replace_filename(
+      fmt::format("{}_{:%Y-%m-%d %H-%M-%S}.txt", l_path.stem().generic_string(), std::chrono::system_clock::now())
+  );
 
   in_json["log"]["output"] = l_path.generic_string();
 }
