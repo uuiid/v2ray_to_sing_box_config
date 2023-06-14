@@ -217,6 +217,15 @@ std::vector<std::shared_ptr<out_base>> get_config(const std::string &in_body) {
   return l_ret;
 }
 
+void set_log(nlohmann::json &in_json) {
+  if (!in_json.contains("log")) return;
+  if (!in_json["log"].contains("output")) return;
+  std::filesystem::path l_path{in_json["log"]["output"].get<std::string>()};
+  l_path.replace_filename(fmt::format("{}_{}.txt", l_path.stem().generic_string(), std::chrono::system_clock::now()));
+
+  in_json["log"]["output"] = l_path.generic_string();
+}
+
 int main(int argc, char *argv[]) try {
   std::locale::global(boost::locale::generator{}("zh_CN.UTF-8"));
   std::setlocale(LC_ALL, "zh_CN.UTF-8");
@@ -268,6 +277,7 @@ int main(int argc, char *argv[]) try {
     l_stream.shutdown(l_ec);
     if (l_ec) std::cout << fmt::format("{}", l_ec.what()) << std::endl;
   }
+  set_log(l_json);
   std::ofstream{cmdl("out").str()} << l_json.dump(2) << std::endl;
   return 0;
 } catch (const std::exception &e) {
