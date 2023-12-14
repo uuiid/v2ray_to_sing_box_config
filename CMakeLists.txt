@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 project(sing_box_config)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 add_compile_definitions(QT_NO_KEYWORDS UNICODE _UNICODE NOMINMAX)

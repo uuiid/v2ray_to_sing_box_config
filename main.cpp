@@ -41,6 +41,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <regex>
+#include <iostream>
 
 class tls_type {
 public:
@@ -252,6 +254,18 @@ std::string split_str(const std::string &in_str) {
     return l_ret[0];
 }
 
+// 需要排除
+bool is_exclude(const std::shared_ptr<out_base> &in_str, const std::vector<std::regex> &in_regex) {
+    if (in_str->server.empty()) return true;
+    if (in_str->server.starts_with("127.")) return true;
+    if (in_str->server == "1") return true;
+    if (in_str->server == "0") return true;
+
+    return std::ranges::any_of(in_regex, [&in_str](const std::regex &in_regex) {
+        return std::regex_match(in_str->tag, in_regex);
+    });
+}
+
 int main(int argc, char *argv[]) try {
     std::locale::global(boost::locale::generator{}("zh_CN.UTF-8"));
     std::setlocale(LC_ALL, "zh_CN.UTF-8");
@@ -267,6 +281,11 @@ int main(int argc, char *argv[]) try {
     //    auto &l_route_direct = l_json["route"]["rules"].emplace_back();
     //    l_route_direct["outbound"] = "direct";
     auto l_default_proxy = get_default_selector("proxy");
+
+    std::vector<std::regex> l_exclude{};
+    for (auto &&i: cmdl.params("exclude_regex")) {
+        l_exclude.emplace_back(i.second);
+    }
     for (auto &&i: cmdl.params("subscribe")) {
         boost::urls::url l_subscribe{i.second};
         std::cout << fmt::format("订阅地址 {}", i.second) << std::endl;
@@ -298,11 +317,11 @@ int main(int argc, char *argv[]) try {
         auto l_selector = get_default_selector(split_str(l_subscribe.host()));
         for (auto &&i: l_config) {
             l_json["outbounds"].push_back(i->get_json());
-            l_json["outbounds"].front()["outbounds"].emplace_back(i->tag);
-
+            if (!is_exclude(i, l_exclude)) {
+                l_json["outbounds"].front()["outbounds"].emplace_back(i->tag);
+                l_default_proxy["outbounds"].emplace_back(i->tag);
+            }
             l_selector["outbounds"].emplace_back(i->tag);
-            l_default_proxy["outbounds"].emplace_back(i->tag);
-            //            l_route_direct["domain"].emplace_back(i->server);
         }
         l_json["outbounds"].push_back(l_selector);
         boost::system::error_code l_ec{};
