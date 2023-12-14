@@ -59,6 +59,7 @@
 				"args": [
 					"--config=C:/Users/td_main/private/backup/Config.json",
 					"--subscribe=https://v2.mugua-sub.com/link/LX1EsJskFXyDCEHq?sub=3",
+					"--subscribe=https://dddd.skin/api/v1/client/subscribe?token=c2dd7049ce24287bd96a80b3953767b0",
 					"--subscribe=https://sub.doumao.top/api/v1/client/subscribe?token=29e4ba87990b6b4d3c39a4d1cd6d80a0",
 					"--out=C:/Users/td_main/private/backup/sing-box/Config.json"
 				],

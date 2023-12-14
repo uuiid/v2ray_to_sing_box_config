@@ -8,7 +8,7 @@
   "$default-features-explanation": "Users using this library transitively will get all backends automatically",
   "default-features": [],
   "features": {},
-  "builtin-baseline": "ffe7360e0f5ba62f98b620575294ecb9d8a02980",
+  "builtin-baseline": "c8696863d371ab7f46e213d8f5ca923c4aef2a00",
   "dependencies": [
     "boost-asio",
     "boost-test",
@@ -32,10 +32,5 @@
     "nlohmann-json",
     "date",
     "entt"
-  ],
-  "vcpkg-configuration": {
-    "overlay-ports": [
-      "./vcpkg_ports"
-    ]
-  }
+  ]
 }
