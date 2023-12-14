@@ -32,5 +32,10 @@
     "nlohmann-json",
     "date",
     "entt"
-  ]
+  ],
+  "vcpkg-configuration": {
+    "overlay-ports": [
+      "./vcpkg_ports"
+    ]
+  }
 }
