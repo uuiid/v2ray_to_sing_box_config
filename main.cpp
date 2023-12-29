@@ -343,5 +343,5 @@ int main(int argc, char *argv[]) try {
     return 0;
 } catch (const std::exception &e) {
     std::cout << fmt::format("{}", e.what()) << std::endl;
-    return 0;
+    return 1;
 }
