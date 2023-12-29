@@ -286,6 +286,7 @@ int main(int argc, char *argv[]) try {
     for (auto &&i: cmdl.params("exclude_regex")) {
         l_exclude.emplace_back(i.second);
     }
+    std::vector<bool> l_subscribe_status{};
     for (auto &&i: cmdl.params("subscribe")) {
         boost::urls::url l_subscribe{i.second};
         std::cout << fmt::format("订阅地址 {}", i.second) << std::endl;
@@ -312,6 +313,11 @@ int main(int argc, char *argv[]) try {
         boost::beast::flat_buffer l_buffer{};
         boost::beast::http::response<boost::beast::http::string_body> l_res{};
         boost::beast::http::read(l_stream, l_buffer, l_res);
+        if (l_res.result() != boost::beast::http::status::ok) {
+            std::cout << fmt::format("订阅失败 {} {}", i.second, l_res.body()) << std::endl;
+            l_subscribe_status.emplace_back(false);
+            continue;
+        }
         auto l_config = get_config(l_res.body());
 
         auto l_selector = get_default_selector(split_str(l_subscribe.host()));
@@ -327,7 +333,10 @@ int main(int argc, char *argv[]) try {
         boost::system::error_code l_ec{};
         l_stream.shutdown(l_ec);
         if (l_ec) std::cout << fmt::format("{}", l_ec.what()) << std::endl;
+        l_subscribe_status.emplace_back(true);
     }
+    if (std::none_of(l_subscribe_status.begin(), l_subscribe_status.end(), [](bool in_bool) { return in_bool; }))
+        return 1;
     l_json["outbounds"].push_back(l_default_proxy);
     set_log(l_json);
     std::ofstream{cmdl("out").str()} << l_json.dump(2) << std::endl;
