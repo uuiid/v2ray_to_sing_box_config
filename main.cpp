@@ -321,6 +321,8 @@ int main(int argc, char *argv[]) try {
         auto l_config = get_config(l_res.body());
 
         auto l_selector = get_default_selector(split_str(l_subscribe.host()));
+        if (l_subscribe.empty())
+            continue;
         for (auto &&i: l_config) {
             l_json["outbounds"].push_back(i->get_json());
             if (!is_exclude(i, l_exclude)) {
