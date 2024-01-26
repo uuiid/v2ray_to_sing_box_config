@@ -270,7 +270,7 @@ int main(int argc, char *argv[]) try {
     std::locale::global(boost::locale::generator{}("zh_CN.UTF-8"));
     std::setlocale(LC_ALL, "zh_CN.UTF-8");
 
-    argh::parser cmdl{{"--config", "--subscribe", "--out"}};
+    argh::parser cmdl{};
     cmdl.parse(argc, argv);
 
     boost::asio::io_context l_io_context{};
@@ -341,7 +341,9 @@ int main(int argc, char *argv[]) try {
         return 1;
     l_json["outbounds"].push_back(l_default_proxy);
     set_log(l_json);
-    std::ofstream{cmdl("out").str()} << l_json.dump(2) << std::endl;
+    std::filesystem::path l_out_path{cmdl("config").str()};
+    if(cmdl("out")) l_out_path = cmdl("out").str();
+    std::ofstream{l_out_path} << l_json.dump(2) << std::endl;
     return 0;
 } catch (const std::exception &e) {
     std::cout << fmt::format("{}", e.what()) << std::endl;
