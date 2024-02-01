@@ -302,6 +302,7 @@ int main(int argc, char *argv[]) try {
     //    auto &l_route_direct = l_json["route"]["rules"].emplace_back();
     //    l_route_direct["outbound"] = "direct";
     auto l_default_proxy = get_default_selector("proxy");
+    l_json["outbounds"] = get_default_outbounds();
 
     std::vector<std::regex> l_exclude{};
     for (auto &&i: cmdl.params("exclude_regex")) {
@@ -344,7 +345,6 @@ int main(int argc, char *argv[]) try {
         auto l_selector = get_default_selector(split_str(l_subscribe.host()));
         if (l_subscribe.empty())
             continue;
-        l_json["outbounds"] = get_default_outbounds();
         for (auto &&i: l_config) {
             l_json["outbounds"].push_back(i->get_json());
             if (!is_exclude(i, l_exclude)) {
