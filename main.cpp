@@ -266,6 +266,27 @@ bool is_exclude(const std::shared_ptr<out_base> &in_str, const std::vector<std::
     });
 }
 
+// 获取默认的 outbounds 字段
+nlohmann::json get_default_outbounds() {
+    nlohmann::json l_json_block{};
+    l_json_block["type"] = "block";
+    l_json_block["tag"] = "block";
+
+    nlohmann::json l_json_direct{};
+    l_json_direct["type"] = "direct";
+    l_json_direct["tag"] = "direct";
+
+    nlohmann::json l_json_reject{};
+    l_json_reject["type"] = "dns";
+    l_json_reject["tag"] = "dns_out";
+
+    nlohmann::json l_json{};
+    l_json.emplace_back(l_json_block);
+    l_json.emplace_back(l_json_direct);
+    l_json.emplace_back(l_json_reject);
+    return l_json;
+}
+
 int main(int argc, char *argv[]) try {
     std::locale::global(boost::locale::generator{}("zh_CN.UTF-8"));
     std::setlocale(LC_ALL, "zh_CN.UTF-8");
@@ -323,10 +344,10 @@ int main(int argc, char *argv[]) try {
         auto l_selector = get_default_selector(split_str(l_subscribe.host()));
         if (l_subscribe.empty())
             continue;
+        l_json["outbounds"] = get_default_outbounds();
         for (auto &&i: l_config) {
             l_json["outbounds"].push_back(i->get_json());
             if (!is_exclude(i, l_exclude)) {
-                l_json["outbounds"].front()["outbounds"].emplace_back(i->tag);
                 l_default_proxy["outbounds"].emplace_back(i->tag);
             }
             l_selector["outbounds"].emplace_back(i->tag);
@@ -342,7 +363,7 @@ int main(int argc, char *argv[]) try {
     l_json["outbounds"].push_back(l_default_proxy);
     set_log(l_json);
     std::filesystem::path l_out_path{cmdl("config").str()};
-    if(cmdl("out")) l_out_path = cmdl("out").str();
+    if (cmdl("out")) l_out_path = cmdl("out").str();
     std::ofstream{l_out_path} << l_json.dump(2) << std::endl;
     return 0;
 } catch (const std::exception &e) {
