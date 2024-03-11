@@ -156,12 +156,18 @@ class out_shadowsocks : public to_json_temp<out_shadowsocks> {
 public:
     std::string method;
     std::string password;
+    std::string plugin;
+    std::string plugin_opts;
     using to_json_temp<out_shadowsocks>::get_json;
 
     friend void to_json(nlohmann::json &in_json, const out_shadowsocks &in_data) {
         to_json(in_json, static_cast<const out_base &>(in_data));
         in_json["method"] = in_data.method;
         in_json["password"] = in_data.password;
+        if (!in_data.plugin.empty()) {
+            in_json["plugin"] = in_data.plugin;
+            in_json["plugin_opts"] = in_data.plugin_opts;
+        }
     }
 };
 
@@ -184,6 +190,17 @@ std::vector<std::shared_ptr<out_base>> get_config(const std::string &in_body) {
             auto l_name = l_url.fragment();
             auto l_method = l_str.substr(0, l_str.find(':'));
             auto l_id = l_str.substr(l_str.find(':') + 1);
+            // ?plugin=simple-obfs;obfs=http;obfs-host=14b95e0125372386c60597ca410983bd.bilibili.com
+            if (auto l_query = l_url.query(); l_url.has_query()) {
+                if (auto l_plug_it = l_query.find("plugin=");l_plug_it != std::string::npos) {
+                    l_out->plugin = "obfs-local";
+                    auto l_sub = l_query.substr(l_query.find(';', l_plug_it) + 1);
+                    if (!l_sub.empty())
+                        l_out->plugin_opts = l_sub;
+                }
+
+            }
+
             l_out->server = l_add;
             l_out->tag = l_name;
             l_out->type = "shadowsocks";
@@ -191,6 +208,7 @@ std::vector<std::shared_ptr<out_base>> get_config(const std::string &in_body) {
             l_out->password = l_id;
             l_out->method = l_method;
             l_out->multiplex.enabled = false;
+
             l_ret.emplace_back(l_out);
         } else {
             auto l_sub = l_str.substr(l_point + 3);
