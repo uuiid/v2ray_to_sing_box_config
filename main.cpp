@@ -134,8 +134,8 @@ class out_vmess : public to_json_temp<out_vmess> {
 public:
     std::int32_t alter_id;
     std::string uuid;
-    std::shared_ptr<tls_type> tls;
-    std::shared_ptr<transport_type> transport;
+    std::shared_ptr <tls_type> tls;
+    std::shared_ptr <transport_type> transport;
 
     friend void to_json(nlohmann::json &in_json, const out_vmess &in_data) {
         to_json(in_json, static_cast<const out_base &>(in_data));
@@ -171,8 +171,8 @@ public:
     }
 };
 
-std::vector<std::shared_ptr<out_base>> get_config(const std::string &in_body) {
-    std::vector<std::shared_ptr<out_base>> l_ret{};
+std::vector <std::shared_ptr<out_base>> get_config(const std::string &in_body) {
+    std::vector <std::shared_ptr<out_base>> l_ret{};
     std::stringstream l_str_str{base64_decode(in_body)};
     for (std::string l_str; std::getline(l_str_str, l_str);) {
         boost::replace_all(l_str, "\r", "");
@@ -265,7 +265,7 @@ nlohmann::json get_default_selector(const std::string &in_name) {
 }
 
 std::string split_str(const std::string &in_str) {
-    std::vector<std::string> l_ret{};
+    std::vector <std::string> l_ret{};
     boost::split(l_ret, in_str, boost::is_any_of("."));
     if (l_ret.size() < 2) return in_str;
     if (l_ret.size() >= 3) return l_ret[1];
@@ -273,7 +273,7 @@ std::string split_str(const std::string &in_str) {
 }
 
 // 需要排除
-bool is_exclude(const std::shared_ptr<out_base> &in_str, const std::vector<std::regex> &in_regex) {
+bool is_exclude(const std::shared_ptr <out_base> &in_str, const std::vector <std::regex> &in_regex) {
     if (in_str->server.empty()) return true;
     if (in_str->server.starts_with("127.")) return true;
     if (in_str->server == "1") return true;
@@ -298,10 +298,18 @@ nlohmann::json get_default_outbounds() {
     l_json_reject["type"] = "dns";
     l_json_reject["tag"] = "dns_out";
 
+    // 转发socket
+    nlohmann::json l_json_socket{};
+    l_json_socket["type"] = "socks";
+    l_json_socket["tag"] = "v2rayn";
+    l_json_socket["server"] = "127.0.0.1";
+    l_json_socket["server_port"] = 10808;
+
     nlohmann::json l_json{};
     l_json.emplace_back(l_json_block);
     l_json.emplace_back(l_json_direct);
     l_json.emplace_back(l_json_reject);
+    l_json.emplace_back(l_json_socket);
     return l_json;
 }
 
@@ -322,7 +330,7 @@ int main(int argc, char *argv[]) try {
     auto l_default_proxy = get_default_selector("proxy");
     l_json["outbounds"] = get_default_outbounds();
 
-    std::vector<std::regex> l_exclude{};
+    std::vector <std::regex> l_exclude{};
     for (auto &&i: cmdl.params("exclude_regex")) {
         l_exclude.emplace_back(i.second);
     }
