@@ -329,7 +329,7 @@ int main(int argc, char *argv[]) try {
     //    l_route_direct["outbound"] = "direct";
     auto l_default_proxy = get_default_selector("proxy");
     l_json["outbounds"] = get_default_outbounds();
-
+    l_default_proxy["outbounds"].emplace_back("v2rayn");
     std::vector <std::regex> l_exclude{};
     for (auto &&i: cmdl.params("exclude_regex")) {
         l_exclude.emplace_back(i.second);
