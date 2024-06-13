@@ -93,9 +93,12 @@ public:
 
     friend void to_json(nlohmann::json &in_json, const multiplex_type &in_data) {
         in_json["enabled"] = in_data.enabled;
-        in_json["protocol"] = in_data.protocol;
-        in_json["max_connections"] = in_data.max_connections;
-        in_json["padding"] = in_data.padding;
+        if (in_data.protocol != "h2mux")
+            in_json["protocol"] = in_data.protocol;
+        if (in_data.max_connections != 4)
+            in_json["max_connections"] = in_data.max_connections;
+        if (!in_data.padding)
+            in_json["padding"] = in_data.padding;
     }
 };
 
@@ -134,8 +137,8 @@ class out_vmess : public to_json_temp<out_vmess> {
 public:
     std::int32_t alter_id;
     std::string uuid;
-    std::shared_ptr <tls_type> tls;
-    std::shared_ptr <transport_type> transport;
+    std::shared_ptr<tls_type> tls;
+    std::shared_ptr<transport_type> transport;
 
     friend void to_json(nlohmann::json &in_json, const out_vmess &in_data) {
         to_json(in_json, static_cast<const out_base &>(in_data));
@@ -171,8 +174,8 @@ public:
     }
 };
 
-std::vector <std::shared_ptr<out_base>> get_config(const std::string &in_body) {
-    std::vector <std::shared_ptr<out_base>> l_ret{};
+std::vector<std::shared_ptr<out_base>> get_config(const std::string &in_body) {
+    std::vector<std::shared_ptr<out_base>> l_ret{};
     std::stringstream l_str_str{base64_decode(in_body)};
     for (std::string l_str; std::getline(l_str_str, l_str);) {
         boost::replace_all(l_str, "\r", "");
@@ -207,7 +210,7 @@ std::vector <std::shared_ptr<out_base>> get_config(const std::string &in_body) {
             l_out->server_port = std::stoi(l_port);
             l_out->password = l_id;
             l_out->method = l_method;
-            l_out->multiplex.enabled = false;
+            l_out->multiplex.enabled = true;
 
             l_ret.emplace_back(l_out);
         } else {
@@ -239,7 +242,7 @@ std::vector <std::shared_ptr<out_base>> get_config(const std::string &in_body) {
                 l_out->tls = std::make_shared<tls_type>();
                 l_out->tls->server_name = l_json["host"];
             }
-            l_out->multiplex.enabled = false;
+            l_out->multiplex.enabled = true;
             l_ret.emplace_back(l_out);
         }
     }
@@ -265,7 +268,7 @@ nlohmann::json get_default_selector(const std::string &in_name) {
 }
 
 std::string split_str(const std::string &in_str) {
-    std::vector <std::string> l_ret{};
+    std::vector<std::string> l_ret{};
     boost::split(l_ret, in_str, boost::is_any_of("."));
     if (l_ret.size() < 2) return in_str;
     if (l_ret.size() >= 3) return l_ret[1];
@@ -273,7 +276,7 @@ std::string split_str(const std::string &in_str) {
 }
 
 // 需要排除
-bool is_exclude(const std::shared_ptr <out_base> &in_str, const std::vector <std::regex> &in_regex) {
+bool is_exclude(const std::shared_ptr<out_base> &in_str, const std::vector<std::regex> &in_regex) {
     if (in_str->server.empty()) return true;
     if (in_str->server.starts_with("127.")) return true;
     if (in_str->server == "1") return true;
@@ -330,7 +333,7 @@ int main(int argc, char *argv[]) try {
     auto l_default_proxy = get_default_selector("proxy");
     l_json["outbounds"] = get_default_outbounds();
     l_default_proxy["outbounds"].emplace_back("v2rayn");
-    std::vector <std::regex> l_exclude{};
+    std::vector<std::regex> l_exclude{};
     for (auto &&i: cmdl.params("exclude_regex")) {
         l_exclude.emplace_back(i.second);
     }
