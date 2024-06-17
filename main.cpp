@@ -44,9 +44,18 @@
 #include <regex>
 #include <iostream>
 
+
+namespace {
+    // 启动多路复用
+    static bool enable_multiplex{false};
+    // 启用 utls
+    static bool enable_utls{false};
+}
+
 class tls_type {
 public:
     class utls_type {
+    public:
         bool enabled{true};
         std::string fingerprint{"chrome"};
 
@@ -63,10 +72,12 @@ public:
     utls_type utls;
 
     friend void to_json(nlohmann::json &in_json, const tls_type &in_data) {
-        in_json["disable_sni"] = in_data.disable_sni;
+        if (in_data.disable_sni)
+            in_json["disable_sni"] = in_data.disable_sni;
         in_json["enabled"] = in_data.enabled;
         in_json["insecure"] = in_data.insecure;
-        in_json["utls"] = in_data.utls;
+        if(in_data.utls.enabled)
+            in_json["utls"] = in_data.utls;
         if (!in_data.server_name.empty()) in_json["server_name"] = in_data.server_name;
     }
 };
@@ -210,7 +221,7 @@ std::vector<std::shared_ptr<out_base>> get_config(const std::string &in_body) {
             l_out->server_port = std::stoi(l_port);
             l_out->password = l_id;
             l_out->method = l_method;
-            l_out->multiplex.enabled = true;
+            l_out->multiplex.enabled = enable_multiplex;
 
             l_ret.emplace_back(l_out);
         } else {
@@ -241,8 +252,9 @@ std::vector<std::shared_ptr<out_base>> get_config(const std::string &in_body) {
             if (!l_json["tls"].get<std::string>().empty()) {
                 l_out->tls = std::make_shared<tls_type>();
                 l_out->tls->server_name = l_json["host"];
+                l_out->tls->utls.enabled = enable_utls;
             }
-            l_out->multiplex.enabled = true;
+            l_out->multiplex.enabled = enable_multiplex;
             l_ret.emplace_back(l_out);
         }
     }
@@ -322,6 +334,9 @@ int main(int argc, char *argv[]) try {
 
     argh::parser cmdl{};
     cmdl.parse(argc, argv);
+
+    enable_multiplex = cmdl["multiplex"];
+    enable_utls = cmdl["utls"];
 
     boost::asio::io_context l_io_context{};
     boost::asio::ssl::context l_ssl_context{boost::asio::ssl::context::tlsv12_client};
